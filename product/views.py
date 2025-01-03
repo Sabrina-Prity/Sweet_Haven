@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from .models import Mango, Comment
 from .serializers import MangoSerializer, CommentSerializer
 from rest_framework import filters, pagination
+from rest_framework.permissions import IsAdminUser
 
 
 
@@ -14,6 +15,7 @@ class MangoViewSet(viewsets.ModelViewSet):
     queryset = Mango.objects.all()
     serializer_class = MangoSerializer
     pagination_class = MangoPagination
+    permission_classes = [IsAdminUser]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'price', 'category__name']
 
