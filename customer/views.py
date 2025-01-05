@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from . import serializers
-from rest_framework import viewsets
+from rest_framework import viewsets,status
 from . import models
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,17 +17,27 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.shortcuts import redirect
 
+
+
 class CustomerViewset(viewsets.ModelViewSet):
     queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomerSerializer
-    permission_classes=[IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return models.Customer.objects.filter(user=self.request.user)
 
     def is_customer(self, request):
         try:
-            Customer.objects.get(user=request.user)
-            return Response({"is_customer": True}, status=200)
-        except Customer.DoesNotExist:
-            return Response({"is_customer": False}, status=200)
+            customer = models.Customer.objects.get(user=request.user)
+            return Response({"is_customer": True}, status=status.HTTP_200_OK)
+        except models.Customer.DoesNotExist:
+            return Response({"is_customer": False}, status=status.HTTP_200_OK)
+
+    def is_customer_status(self, request):
+        return self.is_customer(request)
+
+
 
 class UserRegistrationApiView(APIView):
     serializer_class = serializers.RegistrationSerializer

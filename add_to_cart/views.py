@@ -20,7 +20,7 @@ from django.shortcuts import redirect
 
 class AddToCartViewSet(viewsets.ModelViewSet):
     serializer_class = AddToCartSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return AddToCart.objects.filter(user=self.request.user)
@@ -53,7 +53,7 @@ class AddToCartViewSet(viewsets.ModelViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
@@ -108,7 +108,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 class AdminOrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAdminUser]
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -140,7 +140,7 @@ class AdminOrderViewSet(viewsets.ModelViewSet):
 
 class OrderHistoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
