@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
+from .models import Customer
 # for sending email
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -19,7 +20,14 @@ from django.shortcuts import redirect
 class CustomerViewset(viewsets.ModelViewSet):
     queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomerSerializer
+    permission_classes=[IsAuthenticated]
 
+    def is_customer(self, request):
+        try:
+            Customer.objects.get(user=request.user)
+            return Response({"is_customer": True}, status=200)
+        except Customer.DoesNotExist:
+            return Response({"is_customer": False}, status=200)
 
 class UserRegistrationApiView(APIView):
     serializer_class = serializers.RegistrationSerializer
