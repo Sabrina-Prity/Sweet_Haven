@@ -40,3 +40,37 @@ class RegistrationSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField(required = True)
     password = serializers.CharField(required = True)
+
+
+
+class UserUpdateProfileSerializer(serializers.ModelSerializer):
+    confirm_password = serializers.CharField(required=False, write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'confirm_password']
+        extra_kwargs = {
+            'password': {'write_only': True}, 
+        }
+
+    def validate(self, data):
+        password = data.get('password')
+        confirm_password = data.get('confirm_password')
+        
+        if password and confirm_password:
+            if password != confirm_password:
+                raise serializers.ValidationError({'error': "Passwords do not match."})
+        return data
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+
+        # Update the User fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if password:
+            instance.set_password(password)
+
+        instance.save()
+        return instance

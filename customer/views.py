@@ -114,3 +114,19 @@ class UserLogoutView(APIView):
         except Exception as e:
             return Response({"detail": str(e)}, status=400)
         
+class UserUpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        serializer = serializers.UserUpdateProfileSerializer(request.user)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        serializer = serializers.UserUpdateProfileSerializer(request.user, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Profile updated successfully"}, status=200)
+        
+        return Response(serializer.errors, status=400)
+        
