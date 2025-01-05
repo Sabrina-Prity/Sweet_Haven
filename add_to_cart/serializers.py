@@ -8,7 +8,7 @@ class AddToCartSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    # user = serializers.StringRelatedField(many=False)
+    user = serializers.StringRelatedField(many=False)
     class Meta:
         model = models.Order
         fields = '__all__'

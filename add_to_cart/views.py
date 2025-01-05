@@ -28,20 +28,21 @@ class AddToCartViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         mango = get_object_or_404(Mango, id=request.data.get('mango'))
         quantity = request.data.get('quantity', 1)
+        quantity = int(quantity)
 
-        if quantity > mango.available_quantity:
+        if quantity > mango.quantity:
             return Response(
-                {"detail": f"Requested quantity exceeds available stock. Available: {mango.available_quantity}."},
+                {"detail": f"Requested quantity exceeds available stock. Available: {mango.quantity}."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         cart_item, created = AddToCart.objects.get_or_create(user=request.user, mango=mango)
         if not created:
-            if cart_item.quantity + quantity <= mango.available_quantity:
+            if cart_item.quantity + quantity <= mango.quantity:
                 cart_item.quantity += quantity
             else:
                 return Response(
-                    {"detail": f"Requested quantity exceeds available stock. Available: {mango.available_quantity - cart_item.quantity}."})
+                    {"detail": f"Requested quantity exceeds available stock. Available: {mango.quantity - cart_item.quantity}."})
             cart_item.save()
 
         serializer = self.get_serializer(cart_item)

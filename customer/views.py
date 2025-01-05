@@ -10,6 +10,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 # for sending email
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -24,6 +25,16 @@ class UserRegistrationApiView(APIView):
     serializer_class = serializers.RegistrationSerializer
     
     def post(self, request):
+
+        username = request.data.get('username')
+        email = request.data.get('email')
+
+        if User.objects.filter(username=username).exists():
+            return Response({"error": "Username already exists"}, status=400)
+
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Email already exists"}, status=400)
+
         serializer = self.serializer_class(data=request.data)
         
         if serializer.is_valid():
@@ -61,26 +72,37 @@ def activate(request, uid64, token):
 
 class UserLoginApiView(APIView):
     def post(self, request):
-        serializer = serializers.UserLoginSerializer(data = self.request.data)
+        serializer = serializers.UserLoginSerializer(data=request.data)
+        
         if serializer.is_valid():
             username = serializer.validated_data['username']
             password = serializer.validated_data['password']
 
-            user = authenticate(username= username, password=password)
+            user = authenticate(username=username, password=password)
             
             if user:
                 token, _ = Token.objects.get_or_create(user=user)
-                print(token)
-                print(_)
-                login(request, user)
-                return Response({'token' : token.key, 'user_id' : user.id})
+                login(request, user)  # Log the user in
+                
+                # Return token and login status
+                return Response({
+                    'token': token.key, 
+                    'user_id': user.id, 
+                    'user_logged_in': True
+                })
             else:
-                return Response({'error' : "Invalid Credential"})
+                return Response({'error': "Invalid Credential", 'user_logged_in': False})
+
         return Response(serializer.errors)
 
 class UserLogoutView(APIView):
-    def get(self, request):
-        request.user.auth_token.delete()
-        logout(request)
-        return redirect('login')
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            request.user.auth_token.delete()  # Delete token
+            logout(request)  # Log out user
+            return Response({"detail": "Logout successful"}, status=200)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=400)
         

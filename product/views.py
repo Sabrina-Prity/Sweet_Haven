@@ -14,8 +14,8 @@ class MangoPagination(pagination.PageNumberPagination):
 class MangoViewSet(viewsets.ModelViewSet):
     queryset = Mango.objects.all()
     serializer_class = MangoSerializer
-    pagination_class = MangoPagination
-    permission_classes = [IsAdminUser]
+    # pagination_class = MangoPagination
+    # permission_classes = [IsAdminUser]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'price', 'category__name']
 
