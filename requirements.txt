@@ -2,6 +2,7 @@ asgiref
 crispy-bootstrap5
 dj-database-url
 Django
+django-cors-headers
 django-crispy-forms
 django-environ
 django-filter
@@ -11,6 +12,7 @@ MouseInfo
 numpy
 opencv-contrib-python
 pillow
+pip
 psycopg2
 psycopg2-binary
 PyAutoGUI
