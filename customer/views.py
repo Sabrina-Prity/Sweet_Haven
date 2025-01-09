@@ -12,37 +12,24 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from .models import Customer
+from rest_framework.generics import ListAPIView
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import AllowAny
+
 # for sending email
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.shortcuts import redirect
+from rest_framework.permissions import IsAdminUser
 
-
-
-class CustomerViewset(viewsets.ModelViewSet):
-    queryset = models.Customer.objects.all()
-    serializer_class = serializers.CustomerSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return models.Customer.objects.filter(user=self.request.user)
-
-    def is_customer(self, request):
-        try:
-            customer = models.Customer.objects.get(user=request.user)
-            return Response({"is_customer": True}, status=status.HTTP_200_OK)
-        except models.Customer.DoesNotExist:
-            return Response({"is_customer": False}, status=status.HTTP_200_OK)
-
-    def is_customer_status(self, request):
-        return self.is_customer(request)
 
 
 
 class UserRegistrationApiView(APIView):
+    permission_classes = [AllowAny]
     serializer_class = serializers.RegistrationSerializer
     
-    def post(self, request):
+    def post(self, request):  
 
         username = request.data.get('username')
         email = request.data.get('email')
@@ -58,6 +45,8 @@ class UserRegistrationApiView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             print(user)
+
+            
             token = default_token_generator.make_token(user)
             print("token ", token)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -83,12 +72,13 @@ def activate(request, uid64, token):
     if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        return redirect('login')
+        return redirect('http://127.0.0.1:5500/login.html')
     else:
         return redirect('register')
     
 
 class UserLoginApiView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = serializers.UserLoginSerializer(data=request.data)
         
@@ -100,29 +90,94 @@ class UserLoginApiView(APIView):
             
             if user:
                 token, _ = Token.objects.get_or_create(user=user)
-                login(request, user)  # Log the user in
+                login(request, user)  
                 
-                # Return token and login status
                 return Response({
                     'token': token.key, 
                     'user_id': user.id, 
-                    'user_logged_in': True
+                    "is_admin": user.is_staff,
                 })
             else:
                 return Response({'error': "Invalid Credential", 'user_logged_in': False})
 
         return Response(serializer.errors)
 
+
+
 class UserLogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        
         try:
-            request.user.auth_token.delete()  # Delete token
+            request.user.auth_token.delete() 
             logout(request)  # Log out user
             return Response({"detail": "Logout successful"}, status=200)
         except Exception as e:
             return Response({"detail": str(e)}, status=400)
+        
+
+# class CustomerApiView(APIView):
+#     serializer_class = serializers.CustomerSerializer
+
+#     def post(self, request):
+#         user = request.user  
+        
+#         data = request.data
+#         data['user'] = user.id  
+
+#         serializer = self.serializer_class(data=data)
+#         if serializer.is_valid():
+#             customer = serializer.save()
+#             return Response({"message": "Customer created", "customer_id": customer.id}, status=201)
+#         return Response(serializer.errors, status=400)
+
+
+class CustomerListView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        customers = Customer.objects.all()
+        serializer = serializers.CustomerSerializer(customers, many=True)
+        return Response(serializer.data)
+    
+# class CustomerSearchView(ListAPIView):
+#     queryset = Customer.objects.all()
+#     serializer_class = serializers.CustomerSerializer
+#     filter_backends = [SearchFilter]
+#     search_fields = ['user', 'mobile_no']
+
+class CustomerDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, username):
+        try:
+            customer = Customer.objects.get(user__username=username)
+            serializer = serializers.CustomerSerializer(customer)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Customer.DoesNotExist:
+            return Response({"detail": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # def get(self, request, pk):
+    #         customer = Customer.objects.get(pk=pk)
+    #         serializer = serializers.CustomerSerializer(customer)
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    def put(self, request, pk):
+            customer = Customer.objects.get(pk=pk)
+            serializer = serializers.CustomerSerializer(customer, data=request.data, partial=True)  # allow partial updates
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+       
+    def delete(self, request, pk):
+            customer = Customer.objects.get(pk=pk)
+            customer.delete()
+            return Response({"detail": "Customer deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+       
+
+
+
         
 class UserUpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]

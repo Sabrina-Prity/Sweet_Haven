@@ -9,5 +9,5 @@ router.register('comment', views.CommentViewSet, basename='comment')
 
 urlpatterns = [
     path('', include(router.urls)),
-    
+    # path('comment/', views.CommentView.as_view(), name='comment-list-create'),
 ]

@@ -6,7 +6,7 @@ from product.models import Mango
 
 class Customer(models.Model):
     user = models.OneToOneField(User,unique=True, on_delete = models.CASCADE)
-    image = models.ImageField(upload_to='patient/images/')
+    image = models.CharField(max_length=100, null=True, blank=True)
     mobile_no = models.CharField(max_length = 12)
     
     def __str__(self):

@@ -4,13 +4,25 @@ from product.models import Mango
 from rest_framework.permissions import BasePermission
 # Create your models here.
 
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.user.username}"
+
 class AddToCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mango = models.ForeignKey(Mango, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.PositiveIntegerField(default=1)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
-        return f"Name: {self.mango.name}"
+        return f"Name: {self.mango.name} | Quantity: {self.quantity}"
+
+    def save(self, *args, **kwargs):
+        self.price = self.mango.price * self.quantity
+        super().save(*args, **kwargs)
+
     
 
 BUYING_STATUS = [
@@ -35,8 +47,6 @@ class Order(models.Model):
 
 
 class IsAdminUser(BasePermission):
-    """
-    Custom permission to allow access only to admin users.
-    """
+ 
     def has_permission(self, request, view):
         return request.user and request.user.is_staff

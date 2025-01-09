@@ -10,7 +10,7 @@ class Mango(models.Model):
     quantity = models.IntegerField(default=1)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     description = models.TextField()
-    image = models.ImageField(upload_to="service/images/")
+    image = models.CharField(max_length=200, null=True, blank=True)
     
     
     def __str__(self):
