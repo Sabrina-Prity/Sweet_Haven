@@ -28,7 +28,7 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1",".vercel.app"]
-CSRF_TRUSTED_ORIGINS = ['https://sweet-haven-pb1y-jbtkanrip-sabrinapritys-projects.vercel.app'] 
+# CSRF_TRUSTED_ORIGINS = ['https://sweet-haven-pb1y-jbtkanrip-sabrinapritys-projects.vercel.app'] 
 LOGIN_URL = 'http://127.0.0.1:5500/login.html'
 
 # Application definition
