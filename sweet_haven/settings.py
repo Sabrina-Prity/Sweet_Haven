@@ -28,7 +28,11 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1",".vercel.app"]
-# CSRF_TRUSTED_ORIGINS = ['https://sweet-haven-pb1y-jbtkanrip-sabrinapritys-projects.vercel.app'] 
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://sweet-haven.vercel.app',
+]
+
 LOGIN_URL = 'http://127.0.0.1:5500/login.html'
 
 # Application definition
@@ -89,7 +93,7 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'sweet_haven.wsgi.app'
+WSGI_APPLICATION = 'sweet_haven.wsgi.app'
 
 
 # Database
@@ -173,11 +177,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-WSGI_APPLICATION = 'sweet_haven.wsgi.application'
+# WSGI_APPLICATION = 'sweet_haven.wsgi.application'
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://sweet-haven.vercel.app',
-]
+
 
 
 # Default primary key field type
