@@ -160,17 +160,25 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-# Define the base URL for serving media files
-MEDIA_URL = '/media/'
 
+
+
+
+
+STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Ensure this directory exists
+    os.path.join(BASE_DIR, "staticfiles"),  # Ensure this directory exists
 ]
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "staticfiles")]
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-# Specify the directory where media files are stored
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+WSGI_APPLICATION = 'sweet_haven.wsgi.application'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://sweet-haven.vercel.app',
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
