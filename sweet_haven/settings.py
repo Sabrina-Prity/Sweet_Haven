@@ -55,8 +55,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -89,7 +89,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'sweet_haven.wsgi.app '
+WSGI_APPLICATION = 'sweet_haven.wsgi.app'
 
 
 # Database
@@ -164,6 +164,9 @@ STATIC_URL = 'static/'
 # Define the base URL for serving media files
 MEDIA_URL = '/media/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # Ensure this directory exists
+]
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "staticfiles")]
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # Specify the directory where media files are stored
