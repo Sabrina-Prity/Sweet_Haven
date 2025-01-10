@@ -89,7 +89,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'sweet_haven.wsgi.app'
+# WSGI_APPLICATION = 'sweet_haven.wsgi.app'
 
 
 # Database
