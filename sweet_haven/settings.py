@@ -14,7 +14,7 @@ from pathlib import Path
 import environ
 env = environ.Env()
 environ.Env.read_env()
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,13 +27,14 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["https://sweet-haven.onrender.com"]
-
+ALLOWED_HOSTS = ["127.0.0.1",".vercel.app"]
+# CSRF_TRUSTED_ORIGINS = 
+LOGIN_URL = 'http://127.0.0.1:5500/login.html'
 
 # Application definition
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -87,7 +89,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'sweet_haven.wsgi.application'
+WSGI_APPLICATION = 'sweet_haven.wsgi.app '
 
 
 # Database
@@ -105,10 +107,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': 'masteruser',
-        'PASSWORD': '12345678',
-        'HOST': 'w3-django-project.cdxmgq9zqqlr.us-east-1.rds.amazonaws.com',
-        'PORT': '5432'
+        'USER': 'postgres.wduklpusipdfrcjsmxyh',
+        'PASSWORD': '.kfVQRmD6fXrx$4',
+        'HOST': 'aws-0-ap-southeast-1.pooler.supabase.com',
+        'PORT': '6543'
     }
 }
 
@@ -162,6 +164,8 @@ STATIC_URL = 'static/'
 # Define the base URL for serving media files
 MEDIA_URL = '/media/'
 
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "staticfiles")]
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # Specify the directory where media files are stored
 MEDIA_ROOT = BASE_DIR / 'media'
 
