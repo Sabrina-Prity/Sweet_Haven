@@ -27,10 +27,10 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1",".vercel.app"]
+ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://sweet-haven-pb1y-j2pwt8h6s-sabrinapritys-projects.vercel.app/',
+    'https://sweet-haven-nu.vercel.app',
 ]
 # CSRF_TRUSTED_ORIGINS = [
 #     'https://sweet-haven.vercel.app',
