@@ -347,59 +347,16 @@ class UserSpecificOrderView(APIView):
      
 
 
-
-# class AdminOrderViewSet(viewsets.ModelViewSet):
-#     serializer_class = OrderSerializer
-#     queryset = Order.objects.all()
-#     # permission_classes = [IsAuthenticated]
-#     permission_classes = [IsAdminUser]
-
-#     def update(self, request, *args, **kwargs):
-#         partial = kwargs.pop('partial', False)
-#         order = self.get_object()
-#         serializer = self.get_serializer(order, data=request.data, partial=partial)
-#         serializer.is_valid(raise_exception=True)
-#         self.perform_update(serializer)
-
-#         new_status = request.data.get('buying_status')
-#         if new_status == 'Completed':
-#             email_subject = "Your Order has been Completed"
-#             email_body = render_to_string(
-#                 'purchase_completed_email.html',
-#                 {
-#                     'user': order.user,
-#                     'product': order.product.name,
-#                     'quantity': order.quantity,
-#                 }
-#             )
-#             email = EmailMultiAlternatives(
-#                 email_subject, '', to=[order.user.email]
-#             )
-#             email.attach_alternative(email_body, "text/html")
-#             email.send()
-#             return Response({"message": "A confirmation email has been sent."})
-
-#         return Response(serializer.data)
-
 class AdminOrderAPIView(APIView):
     permission_classes = [IsAdminUser]
 
     def get(self, request, *args, **kwargs):
-        # Get all orders
         orders = Order.objects.all()
-        serializer = OrderSerializer(orders, many=True)
+        serializer = serializers.OrderGetSerializer(orders, many=True)
         return Response(serializer.data)
 
-    def delete(self, request, *args, **kwargs):
-        # Delete an order
-        order = self.get_order(kwargs['pk'])
-        if not order:
-            return Response({"message": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
-        order.delete()
-        return Response({"message": "Order deleted successfully."})
 
     def get_order(self, order_id):
-        # Helper method to get an order by its ID
         try:
             return Order.objects.get(id=order_id)
         except Order.DoesNotExist:
@@ -410,7 +367,6 @@ class AdminOrderUpdateAPIView(APIView):
     permission_classes = [IsAdminUser]
 
     def put(self, request, *args, **kwargs):
-        # Update the order status to "Completed" and send email
         order = self.get_order(kwargs['pk'])
         if not order:
             return Response({"message": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -421,23 +377,28 @@ class AdminOrderUpdateAPIView(APIView):
             new_status = request.data.get('buying_status')
 
             if new_status == 'Completed':
-                self.send_order_completion_email(order)  # Send email when order status is 'Completed'
+                self.send_order_completion_email(order)  
                 return Response({"message": "Order updated to 'Completed' and email sent."})
 
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    
+    def delete(self, request, *args, **kwargs):
+        order = self.get_order(kwargs['pk'])
+        if not order:
+            return Response({"message": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+        order.delete()
+        return Response({"message": "Order deleted successfully."})
 
     def get_order(self, order_id):
-        # Helper method to get an order by its ID
         try:
             return Order.objects.get(id=order_id)
         except Order.DoesNotExist:
             return None
 
     def send_order_completion_email(self, order):
-        # Send email to user and admin when order status is "Completed"
-        
-        # Email to user
         email_subject = "Your Order has been Completed"
         email_body = render_to_string(
             'purchase_completed_email.html',
@@ -456,7 +417,7 @@ class AdminOrderUpdateAPIView(APIView):
         
 
 
-        
+
 class OrderHistoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = OrderSerializer
     # permission_classes = [IsAuthenticated]

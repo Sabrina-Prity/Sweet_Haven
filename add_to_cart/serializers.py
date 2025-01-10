@@ -4,6 +4,7 @@ from product.serializers import MangoSerializer
 from product.models import Mango
 from django.contrib.auth.models import User
 from .models import Cart
+from customer.serializers import CustomerSerializer
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
