@@ -1,3 +1,10 @@
 sweet_haven/.env
 db.sqlite3
 __pycache__/
+.txt
+.git
+.gitignore
+*.pyc
+staticfiles/
+media/
+Images/
