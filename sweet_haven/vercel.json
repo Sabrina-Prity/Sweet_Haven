@@ -7,9 +7,8 @@
         }
     ],
     "routes":[
-        {
-            "src":"/(.*)",
-            "dest": "sweet_haven/wsgi.py"
-        }
+        
+            { "source": "/(.*)", "destination": "/" }
+        
     ]
 }
